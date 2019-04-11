@@ -1,0 +1,60 @@
+---
+title: "Economist Chart"
+author: "Mike Silva"
+date: "4/11/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r loading libraries}
+library(tidyverse)
+library(ggthemes)
+library(janitor)
+
+```
+
+
+
+```{r read data in}
+x <- read_csv("http://infographics.economist.com/databank/Economist_corbyn.csv",
+              col_types = cols(
+  Page = col_character(),
+  `Average number of likes per Facebook post 2016` = col_double()))
+```
+
+
+```{r}
+p0 <-
+  x %>%
+  filter(! is.na(`Average number of likes per Facebook post 2016`)) %>%
+  clean_names() %>%
+  mutate(page = fct_relevel(page, c(
+                              "Saving Labour",
+                              "Andy Burnham",
+                              "Owen Smith",
+                              "Momentum",
+                              "Labour Party",
+                              "Jeremy Corbyn"
+                              ))) %>%
+  mutate(average = average_number_of_likes_per_facebook_post_2016/1000)
+
+p <- 
+  ggplot(data = p0,
+         mapping = aes(x = page, y = average))
+         
+p2 <-
+  p + geom_col() + coord_flip() + labs(
+    title = "Left Click",
+    subtitle = "Average number of Likes per Facebook post \n2016, '000",
+    caption = "Source = Facebook"
+    
+  )
+
+theme_set(theme_economist())
+
+p2
+```
+
